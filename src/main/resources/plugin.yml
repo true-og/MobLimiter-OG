@@ -1,9 +1,9 @@
 name: MobLimiter
-version: ${project.version}
+version: '${version}'
 description: Control the mob population
 authors: ["Travis Watkins", "redwall_hp"]
 softdepend: ["LogBlock"]
-api-version: '1.20'
+api-version: '${apiVersion}'
 
 main: nu.nerd.moblimiter.MobLimiter
 
@@ -17,8 +17,12 @@ permissions:
       moblimiter.limits: true
       moblimiter.check: true
       moblimiter.spawners.bypass: true
+      moblimiter.notify: true
   moblimiter.reload:
     description: Access to reload command
+    default: op
+  moblimiter.notify:
+    description: Receive in-game despawn notifications
     default: op
   moblimiter.count:
     description: Access to count command

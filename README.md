@@ -1,5 +1,17 @@
-MobLimiter
-===========
+MobLimiter-OG
+=============
+
+TrueOG Network fork of [MobLimiter](https://github.com/NerdNu/MobLimiter). Ported to Gradle 8.14.3 / Purpur API 1.19.4 with additional population controls and admin visibility.
+
+Changes over upstream
+---------------------
+
+* **Gradle 8.14.3 build** targeting Purpur API `1.19.4-R0.1-SNAPSHOT`. Uses [Template-OG](https://github.com/true-og/Template-OG) tooling (Spotless, Checkstyle, Shadow, Eclipse integration).
+* **Tamed mob limiting** — new `limit_tamed` config flag (default `false`). When `true`, tamed mobs are no longer exempt from age / spawn / chunk-unload limiters.
+* **Elder guardian limiting** — new `limit_elder_guardian` config flag (default `false`). When `true`, elder guardians are no longer exempt.
+* **Despawn console log** — new `despawn_log_console` flag (default `false`). When `true`, every entity removed by MobLimiter is logged to the server console with the entity type, reason (`age limit`, `chunk unload cull`, `spawn cap radius`, `spawn cap chunk`), world, and block coordinates.
+* **Despawn player notifications** — new `despawn_notify_players` flag (default `false`) and matching permission `moblimiter.notify` (default `op`). When enabled, every despawn is broadcast to online players holding the permission.
+* **Configurable notify message** — `despawn_notify_message` template with `&`-color codes and placeholders `%mob%`, `%reason%`, `%world%`, `%x%`, `%y%`, `%z%`.
 
 Version 2 of MobLimiter, featuring three configurable Limiter engines that control the mob population in different ways.
 
@@ -29,6 +41,11 @@ Configuration
 * `growth_ticks`: Ticks for a farm animal to grow up (-1 to disable)
 * `logblock`: Enable LogBlock support. More below.
 * `debug`: Print debugging info to console
+* `limit_tamed`: If `true`, tamed mobs are subject to all limiters. Default `false`.
+* `limit_elder_guardian`: If `true`, elder guardians are subject to all limiters. Default `false`.
+* `despawn_log_console`: If `true`, log every MobLimiter despawn to the server console. Default `false`.
+* `despawn_notify_players`: If `true`, broadcast every despawn to online players with `moblimiter.notify`. Default `false`.
+* `despawn_notify_message`: Template for the notification. Supports `&`-color codes and placeholders `%mob%`, `%reason%`, `%world%`, `%x%`, `%y%`, `%z%`.
 
 
 ### Default Limits
@@ -107,9 +124,9 @@ The criteria include:
 
 * Mobs with custom names, such as from a name tag
  
-* Tamed mobs
+* Tamed mobs *(unless `limit_tamed: true`)*
 
-* Elder guardians. (Regular guardians can be limited, but Elder ones won't be touched.)
+* Elder guardians. (Regular guardians can be limited, but Elder ones won't be touched unless `limit_elder_guardian: true`.)
 
 * Any mob that is holding an item, as it may have picked up a player's equipment.
 
@@ -139,4 +156,14 @@ name of `MobLimiter`.
 * `/moblimiter check` — Inspect the mob you're looking at, printing its age, limits and statuses. Requires `moblimiter.check`.
 
 All commands can be accessed with the `moblimiter.*` permission node.
+
+### Permissions
+
+* `moblimiter.reload` — `/moblimiter reload`
+* `moblimiter.count` — `/moblimiter count`
+* `moblimiter.limits` — `/moblimiter limits`
+* `moblimiter.check` — `/moblimiter check`
+* `moblimiter.spawners.bypass` — Modify spawners with spawn eggs.
+* `moblimiter.notify` — Receive in-game despawn notifications when `despawn_notify_players` is enabled.
+* `moblimiter.*` — All of the above.
 

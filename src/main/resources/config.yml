@@ -5,6 +5,21 @@ logblock: false
 relative_age: false
 debug: false
 
+# Include tamed mobs when applying limits (default: false — tamed mobs are exempt)
+limit_tamed: false
+
+# Include elder guardians when applying limits (default: false — elder guardians are exempt)
+limit_elder_guardian: false
+
+# Log every despawn executed by this plugin to the server console
+despawn_log_console: false
+
+# Send a message to online players with permission moblimiter.notify whenever a despawn is executed
+despawn_notify_players: false
+
+# Message sent on despawn. Placeholders: %mob%, %reason%, %world%, %x%, %y%, %z%. Supports &-color codes.
+despawn_notify_message: "&7[MobLimiter] Despawned &e%mob%&7 (%reason%) at &f%world% %x%,%y%,%z%"
+
 
 defaults:
   age: -1
