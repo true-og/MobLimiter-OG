@@ -1,65 +1,77 @@
-radius: 3
-breeding_ticks: 400
-growth_ticks: 400
+# Spawn-radius check in chunks. 2 = 5x5 = 25 chunks around a spawn event.
+# Smaller radius lets multiple nearby farms coexist without starving each other.
+radius: 2
+
+# Breeding cooldown / baby growth accelerators. -1 disables override (vanilla timings).
+# Vanilla: breeding cooldown 5 min (6000t), baby growth 20 min (24000t).
+breeding_ticks: -1
+growth_ticks: -1
+
 logblock: false
 relative_age: false
 debug: false
 
-# Include tamed mobs when applying limits (default: false — tamed mobs are exempt)
+# Tamed mobs (pets, horses, etc.) are exempt from limits. 200-player servers
+# accumulate lots of pets; leaving this false prevents silent pet losses.
 limit_tamed: false
 
-# Include elder guardians when applying limits (default: false — elder guardians are exempt)
-limit_elder_guardian: false
+# Elder guardians are rare/unique.
+limit_elder_guardian: true
 
-# Log every despawn executed by this plugin to the server console
-despawn_log_console: false
+# Console-log every despawn. Useful for staff audit; disable if log volume becomes a problem.
+despawn_log_console: true
 
-# Send a message to online players with permission moblimiter.notify whenever a despawn is executed
+# In-game broadcast to moblimiter.notify holders. At 200 players + stacked farms
+# this spams chat heavily. Leave off; console log + /moblimiter stats is enough.
 despawn_notify_players: false
 
-# Message sent on despawn. Placeholders: %mob%, %reason%, %world%, %x%, %y%, %z%. Supports &-color codes.
-despawn_notify_message: "&7[MobLimiter] Despawned &e%mob%&7 (%reason%) at &f%world% %x%,%y%,%z%"
+despawn_notify_message: "&7[&cMobLimiter&f-&4OG&7] Despawned &e%mob%&7 (%reason%) at &f%world% %x%,%y%,%z%"
 
 
+# Defaults tuned for farm-friendly + stacker-friendly operation.
+# ChunkCap-OG enforces the hard per-chunk total entity ceiling; these caps are
+# the per-type soft caps that only trip on excessive single-type density.
 defaults:
-  age: -1
-  max: 150
-  chunk_max: 50
-  cull: 4
+  age: -1          # Passive/unspecified mobs do not age-despawn (vanilla)
+  max: 800         # Same-type cap across the 5x5 spawn radius
+  chunk_max: 200   # Same-type cap per chunk (stackers easily stay under)
+  cull: 12         # Keep this many per type per chunk on chunk unload
 
 
+# Per-mob overrides. age in ticks (20t = 1s, 24000t = 20min).
+# cull = count retained per chunk on unload cull; -1 = never cull.
 limits:
   bat:
-    cull: 6
+    cull: 8
   blaze:
-    age: 12000
-    cull: 0
+    age: 18000
+    cull: 8
   cave_spider:
-    age: 12000
-    cull: 2
+    age: 24000
+    cull: 8
   chicken: []
   cod: []
   cow: []
   creeper:
     age: 24000
-    cull: 8
+    cull: 16
   dolphin: []
   ender_dragon: []
   enderman:
     age: 18000
-    cull: 0
+    cull: 8
   endermite:
     cull: 6
   evoker: []
   ghast:
-    cull: 1
+    cull: 4
   giant:
     cull: -1
   guardian:
     age: 12000
-    max: 100
-    chunk_max: 25
-    cull: 4
+    max: 600
+    chunk_max: 100
+    cull: 12
   horse:
     age: -1
   illusioner: []
@@ -68,6 +80,7 @@ limits:
     cull: 8
   magma_cube:
     age: 24000
+    cull: 12
   mushroom_cow: []
   ocelot:
     cull: 8
@@ -77,73 +90,77 @@ limits:
   pig: []
   pig_zombie:
     age: 18000
+    cull: 16
   pufferfish: []
   rabbit:
     cull: 8
   salmon: []
   sheep_white:
-    cull: 2
+    cull: 8
   sheep_orange:
-    cull: 2
+    cull: 8
   sheep_magenta:
-    cull: 2
+    cull: 8
   sheep_light_blue:
-    cull: 2
+    cull: 8
   sheep_yellow:
-    cull: 2
+    cull: 8
   sheep_lime:
-    cull: 2
+    cull: 8
   sheep_pink:
-    cull: 2
+    cull: 8
   sheep_silver:
-    cull: 2
+    cull: 8
   sheep_cyan:
-    cull: 2
+    cull: 8
   sheep_purple:
-    cull: 2
+    cull: 8
   sheep_blue:
-    cull: 2
+    cull: 8
   sheep_brown:
-    cull: 2
+    cull: 8
   sheep_green:
-    cull: 2
+    cull: 8
   sheep_red:
-    cull: 2
+    cull: 8
   sheep_black:
-    cull: 2
+    cull: 8
   shulker: []
   silverfish:
     cull: 6
   skeleton:
     age: 24000
+    cull: 16
   slime:
     age: 24000
+    cull: 12
   snowman:
     cull: -1
   spider:
-    age: 12000
-    cull: 2
+    age: 24000
+    cull: 12
   squid:
     age: 12000
-    max: 80
-    chunk_max: 5
-    cull: 1
+    max: 400
+    chunk_max: 50
+    cull: 8
   tropical_fish: []
   turtle: []
   vex: []
   villager:
-    chunk_max: 20
+    chunk_max: 40
     age: -1
   vindicator: []
   witch:
     age: 24000
-    cull: 2
+    cull: 12
   wither:
     cull: -1
   wolf:
     cull: 8
   zombie:
     age: 24000
+    cull: 16
 
 spawn_eggs:
   - 'ALLAY_SPAWN_EGG'
