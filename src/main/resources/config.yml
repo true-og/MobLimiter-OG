@@ -88,7 +88,7 @@ limits:
     cull: 8
   phantom: []
   pig: []
-  pig_zombie:
+  zombified_piglin:
     age: 18000
     cull: 16
   pufferfish: []

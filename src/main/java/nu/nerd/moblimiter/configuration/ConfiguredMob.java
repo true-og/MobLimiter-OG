@@ -29,19 +29,8 @@ public class ConfiguredMob {
 
         try {
 
-            String name;
-            if (mob.getName().toUpperCase().startsWith("SHEEP_")) {
-
-                name = "SHEEP";
-
-            } else {
-
-                name = mob.getName();
-
-            }
-
             key = mob.getName().toUpperCase();
-            type = EntityType.valueOf(name.toUpperCase());
+            type = resolveEntityType(mob.getName());
             age = mob.getInt("age", defaults.getAge());
             max = mob.getInt("max", defaults.getMax());
             chunkMax = mob.getInt("chunk_max", defaults.getChunkMax());
@@ -64,19 +53,8 @@ public class ConfiguredMob {
      */
     public ConfiguredMob(String mobKey, ConfiguredDefaults defaults) {
 
-        String name;
-        if (mobKey.toUpperCase().startsWith("SHEEP_")) {
-
-            name = "SHEEP";
-
-        } else {
-
-            name = mobKey.toUpperCase();
-
-        }
-
         key = mobKey.toUpperCase();
-        type = EntityType.valueOf(name.toUpperCase());
+        type = resolveEntityType(mobKey);
         age = defaults.getAge();
         max = defaults.getMax();
         chunkMax = defaults.getChunkMax();
@@ -137,6 +115,26 @@ public class ConfiguredMob {
     public int getCull() {
 
         return cull;
+
+    }
+
+    /**
+     * Resolve config keys to current Bukkit entity enum names.
+     */
+    private static EntityType resolveEntityType(String mobKey) {
+
+        String name = mobKey.toUpperCase();
+        if (name.startsWith("SHEEP_")) {
+
+            name = "SHEEP";
+
+        } else if (name.equals("PIG_ZOMBIE") || name.equals("ZOMBIE_PIGMAN")) {
+
+            name = "ZOMBIFIED_PIGLIN";
+
+        }
+
+        return EntityType.valueOf(name);
 
     }
 
