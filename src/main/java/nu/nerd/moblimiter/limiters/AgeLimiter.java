@@ -90,9 +90,16 @@ public class AgeLimiter extends BukkitRunnable implements Listener {
             if (isTargetingPlayer(entity))
                 continue;
 
-            // Remove mobs
+            // Remove mobs. Enchanted-item mobs get a multiplied age threshold.
             ConfiguredMob limits = plugin.getConfiguration().getLimits(entity);
-            if (!entity.isDead() && adjustedAge(entity) > limits.getAge() && limits.getAge() > -1) {
+            int ageLimit = limits.getAge();
+            if (ageLimit > -1 && EntityHelper.hasEnchantedItem((LivingEntity) entity)) {
+
+                ageLimit = (int) (ageLimit * plugin.getConfiguration().getEnchantedAgeMultiplier());
+
+            }
+
+            if (!entity.isDead() && adjustedAge(entity) > ageLimit && ageLimit > -1) {
 
                 EntityHelper.notifyDespawn(entity, "age limit");
                 ((LivingEntity) entity).damage(1000); // Kill the entity and drop its items

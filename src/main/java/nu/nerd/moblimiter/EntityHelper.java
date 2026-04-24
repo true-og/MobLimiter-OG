@@ -47,6 +47,8 @@ public class EntityHelper {
      */
     public static boolean isSpecialMob(LivingEntity entity) {
 
+        Configuration cfg = getConfiguration();
+
         // Keep mobs with custom names
         if (entity.customName() != null) {
 
@@ -55,7 +57,7 @@ public class EntityHelper {
         }
 
         // Don't remove tamed mobs (unless limit_tamed is enabled)
-        if (!getConfiguration().limitTamed() && entity instanceof Tameable) {
+        if (!cfg.limitTamed() && entity instanceof Tameable) {
 
             Tameable tameable = (Tameable) entity;
             if (tameable.isTamed()) {
@@ -67,17 +69,50 @@ public class EntityHelper {
         }
 
         // Save the sponge! (unless limit_elder_guardian is enabled)
-        if (!getConfiguration().limitElderGuardian() && entity.getType() == EntityType.ELDER_GUARDIAN) {
+        if (!cfg.limitElderGuardian() && entity.getType() == EntityType.ELDER_GUARDIAN) {
 
             return true;
 
         }
 
-        // Don't remove mobs that are holding something, which they may have picked up
+        // Equipped mobs (armor or hand items) are handled specially. When
+        // limit_armed is true (default), armed mobs are culled and this
+        // overrides respect_persistence — picking up an item sets vanilla
+        // PersistenceRequired, which is the exact abuse path the toggle closes.
+        boolean armed = hasEquippedItem(entity);
+        if (armed) {
+
+            return !cfg.limitArmed();
+
+        }
+
+        // Honor vanilla PersistenceRequired for unarmed mobs: spawn-egg,
+        // /summon, trader llamas, etc. Natural-spawn mobs are not persistent,
+        // so farm cycling is unaffected.
+        if (cfg.respectPersistence() && entity.isPersistent()) {
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    /**
+     * True if the mob has any non-AIR item in armor slots, main hand, or off hand.
+     */
+    private static boolean hasEquippedItem(LivingEntity entity) {
+
         EntityEquipment equipment = entity.getEquipment();
+        if (equipment == null) {
+
+            return false;
+
+        }
+
         for (ItemStack armor : equipment.getArmorContents()) {
 
-            // Unarmored mobs, even animals, spawn with 1xAIR as armor.
             if (armor != null && armor.getType() != Material.AIR) {
 
                 return true;
@@ -86,10 +121,40 @@ public class EntityHelper {
 
         }
 
-        // Don't cull allays who are holding items
-        if (entity.getType() == EntityType.ALLAY) {
+        ItemStack main = equipment.getItemInMainHand();
+        if (main != null && main.getType() != Material.AIR) {
 
-            if (equipment.getItemInMainHand() != null && equipment.getItemInMainHand().getType() != Material.AIR) {
+            return true;
+
+        }
+
+        ItemStack off = equipment.getItemInOffHand();
+        if (off != null && off.getType() != Material.AIR) {
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    /**
+     * True if the mob has any enchanted item in armor slots, main hand, or off
+     * hand. Used to grant a longer age limit via enchanted_age_multiplier.
+     */
+    public static boolean hasEnchantedItem(LivingEntity entity) {
+
+        EntityEquipment equipment = entity.getEquipment();
+        if (equipment == null) {
+
+            return false;
+
+        }
+
+        for (ItemStack armor : equipment.getArmorContents()) {
+
+            if (isEnchanted(armor)) {
 
                 return true;
 
@@ -97,7 +162,19 @@ public class EntityHelper {
 
         }
 
-        return false;
+        return isEnchanted(equipment.getItemInMainHand()) || isEnchanted(equipment.getItemInOffHand());
+
+    }
+
+    private static boolean isEnchanted(ItemStack item) {
+
+        if (item == null || item.getType() == Material.AIR) {
+
+            return false;
+
+        }
+
+        return !item.getEnchantments().isEmpty();
 
     }
 
@@ -271,9 +348,9 @@ public class EntityHelper {
     }
 
     /**
-     * Log/broadcast a despawn event per configuration. Console log gated by
-     * despawn_log_console; player message gated by despawn_notify_players and
-     * moblimiter.notify permission.
+     * Log/broadcast a despawn event per configuration. Console log gated by debug;
+     * player message gated by despawn_notify_players and moblimiter.notify
+     * permission.
      *
      * @param entity the entity that was despawned
      * @param reason short reason string (e.g. "age limit", "chunk cull", "spawn cap
@@ -282,7 +359,7 @@ public class EntityHelper {
     public static void notifyDespawn(Entity entity, String reason) {
 
         Configuration cfg = getConfiguration();
-        if (!cfg.despawnLogConsole() && !cfg.despawnNotifyPlayers()) {
+        if (!cfg.debug() && !cfg.despawnNotifyPlayers()) {
 
             return;
 
@@ -297,7 +374,7 @@ public class EntityHelper {
 
         Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(raw);
 
-        if (cfg.despawnLogConsole()) {
+        if (cfg.debug()) {
 
             String plain = PlainTextComponentSerializer.plainText().serialize(component);
             MobLimiter.instance.getLogger().info(plain);

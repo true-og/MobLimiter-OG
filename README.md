@@ -9,7 +9,10 @@ Changes over upstream
 * **Gradle 8.14.3 build** targeting Purpur API `1.19.4-R0.1-SNAPSHOT`. Uses [Template-OG](https://github.com/true-og/Template-OG) tooling (Spotless, Checkstyle, Shadow, Eclipse integration).
 * **Tamed mob limiting** — new `limit_tamed` config flag (default `false`). When `true`, tamed mobs are no longer exempt from age / spawn / chunk-unload limiters.
 * **Elder guardian limiting** — new `limit_elder_guardian` config flag (default `false`). When `true`, elder guardians are no longer exempt.
-* **Despawn console log** — new `despawn_log_console` flag (default `false`). When `true`, every entity removed by MobLimiter is logged to the server console with the entity type, reason (`age limit`, `chunk unload cull`, `spawn cap radius`, `spawn cap chunk`), world, and block coordinates.
+* **Vanilla persistence respect** — new `respect_persistence` flag (default `true`). Honors vanilla `PersistenceRequired` so spawn-egg, `/summon`, and trader-llama mobs are exempt from limiters, matching vanilla "never despawn" semantics. Natural-spawn mobs (spawners, mob spawning) are not persistent and remain subject to limits.
+* **Armed-mob culling** — new `limit_armed` flag (default `true`). Mobs carrying armor, a main-hand item, or an off-hand item are culled instead of protected. Closes the abuse path where players drop gear to mobs to keep them loaded indefinitely (vanilla sets `PersistenceRequired` on pickup). When `true` this overrides `respect_persistence` for armed mobs. Named / tamed / elder guardian exemptions still apply.
+* **Enchanted-item age extension** — new `enchanted_age_multiplier` (default `2.0`). Mobs holding or wearing any enchanted item get their configured `age` limit multiplied by this value before culling. `1.0` disables the feature; `age: -1` mobs are unaffected.
+* **Debug-gated despawn console log** — every plugin-initiated despawn logs to the server console when `debug` is on, including entity type, reason (`age limit`, `chunk unload cull`, `spawn cap radius`, `spawn cap chunk`), world, and block coordinates. (Upstream's separate `despawn_log_console` option was removed in favor of gating on `debug`.)
 * **Despawn player notifications** — new `despawn_notify_players` flag (default `false`) and matching permission `moblimiter.notify` (default `op`). When enabled, every despawn is broadcast to online players holding the permission.
 * **Configurable notify message** — `despawn_notify_message` template with `&`-color codes and placeholders `%mob%`, `%reason%`, `%world%`, `%x%`, `%y%`, `%z%`.
 
@@ -43,7 +46,9 @@ Configuration
 * `debug`: Print debugging info to console
 * `limit_tamed`: If `true`, tamed mobs are subject to all limiters. Default `false`.
 * `limit_elder_guardian`: If `true`, elder guardians are subject to all limiters. Default `false`.
-* `despawn_log_console`: If `true`, log every MobLimiter despawn to the server console. Default `false`.
+* `respect_persistence`: If `true`, honor vanilla `PersistenceRequired` (spawn eggs, `/summon`, trader llamas). Default `true`.
+* `limit_armed`: If `true`, cull mobs carrying armor or hand items; overrides `respect_persistence` for armed mobs. Default `true`.
+* `enchanted_age_multiplier`: Multiplier applied to a mob's configured `age` when it is holding or wearing an enchanted item. Default `2.0`.
 * `despawn_notify_players`: If `true`, broadcast every despawn to online players with `moblimiter.notify`. Default `false`.
 * `despawn_notify_message`: Template for the notification. Supports `&`-color codes and placeholders `%mob%`, `%reason%`, `%world%`, `%x%`, `%y%`, `%z%`.
 
@@ -123,12 +128,14 @@ MobLimiter will not remove any mobs that are deemed to be "special" in some way 
 The criteria include:
 
 * Mobs with custom names, such as from a name tag
- 
+
 * Tamed mobs *(unless `limit_tamed: true`)*
 
 * Elder guardians. (Regular guardians can be limited, but Elder ones won't be touched unless `limit_elder_guardian: true`.)
 
-* Any mob that is holding an item, as it may have picked up a player's equipment.
+* Mobs wearing armor or holding items in their main or off hand *(unless `limit_armed: true`, the default; players would otherwise abuse this by dropping gear to mobs to keep them loaded)*. Mobs holding or wearing any enchanted item still get culled under `limit_armed: true`, but receive an extended age threshold via `enchanted_age_multiplier` (default `2.0` = double the configured age).
+
+* Mobs with vanilla `PersistenceRequired` set, including spawn-egg placements, `/summon` commands, and trader llamas *(unless `respect_persistence: false`)*. Armed mobs are still culled when `limit_armed: true`, since picking up an item also sets `PersistenceRequired` in vanilla and would otherwise reopen the abuse path.
 
 
 ### LogBlock Integration

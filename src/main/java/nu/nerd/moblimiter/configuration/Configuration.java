@@ -22,7 +22,9 @@ public class Configuration {
     private boolean relativeAge;
     private boolean limitTamed;
     private boolean limitElderGuardian;
-    private boolean despawnLogConsole;
+    private boolean respectPersistence;
+    private boolean limitArmed;
+    private double enchantedAgeMultiplier;
     private boolean despawnNotifyPlayers;
     private String despawnNotifyMessage;
     private ConfiguredDefaults defaults;
@@ -52,7 +54,9 @@ public class Configuration {
         this.relativeAge = plugin.getConfig().getBoolean("relative_age", false);
         this.limitTamed = plugin.getConfig().getBoolean("limit_tamed", false);
         this.limitElderGuardian = plugin.getConfig().getBoolean("limit_elder_guardian", false);
-        this.despawnLogConsole = plugin.getConfig().getBoolean("despawn_log_console", false);
+        this.respectPersistence = plugin.getConfig().getBoolean("respect_persistence", true);
+        this.limitArmed = plugin.getConfig().getBoolean("limit_armed", true);
+        this.enchantedAgeMultiplier = plugin.getConfig().getDouble("enchanted_age_multiplier", 2.0);
         this.despawnNotifyPlayers = plugin.getConfig().getBoolean("despawn_notify_players", false);
         this.despawnNotifyMessage = plugin.getConfig().getString("despawn_notify_message",
                 "&7[MobLimiter] Despawned &e%mob%&7 (%reason%) at &f%world% %x%,%y%,%z%");
@@ -173,10 +177,27 @@ public class Configuration {
 
     }
 
-    /** Log every despawn executed by plugin to console. */
-    public boolean despawnLogConsole() {
+    /** Honor vanilla PersistenceRequired (spawn eggs, /summon, picked-up items). */
+    public boolean respectPersistence() {
 
-        return despawnLogConsole;
+        return respectPersistence;
+
+    }
+
+    /**
+     * Cull mobs carrying armor or hand items. Overrides respect_persistence for
+     * armed mobs.
+     */
+    public boolean limitArmed() {
+
+        return limitArmed;
+
+    }
+
+    /** Age-limit multiplier for mobs holding or wearing an enchanted item. */
+    public double getEnchantedAgeMultiplier() {
+
+        return enchantedAgeMultiplier;
 
     }
 

@@ -18,11 +18,25 @@ limit_tamed: false
 # Elder guardians are rare/unique.
 limit_elder_guardian: true
 
-# Console-log every despawn. Useful for staff audit; disable if log volume becomes a problem.
-despawn_log_console: true
+# Honor vanilla PersistenceRequired. Spawn-egg / /summon / picked-up-item mobs
+# survive limits, matching vanilla "never despawn" semantics. Natural-spawn
+# (farm spawners, mob spawning) is unaffected — those are not persistent.
+respect_persistence: true
+
+# Cull mobs carrying armor or hand items. Closes the abuse path where players
+# drop gear to mobs (which sets PersistenceRequired in vanilla) to keep them
+# loaded indefinitely. When true this overrides respect_persistence for armed
+# mobs. Named / tamed / elder guardian exemptions still apply.
+limit_armed: true
+
+# Multiplier applied to a mob's configured age limit when it is holding or
+# wearing an enchanted item. Lets admins give rarer geared mobs more airtime
+# without disabling limits. 1.0 = no extra time, 2.0 = double. Mobs with
+# age: -1 are unaffected.
+enchanted_age_multiplier: 2.0
 
 # In-game broadcast to moblimiter.notify holders. At 200 players + stacked farms
-# this spams chat heavily. Leave off; console log + /moblimiter stats is enough.
+# this spams chat heavily. Leave off; /moblimiter stats is enough.
 despawn_notify_players: false
 
 despawn_notify_message: "&7[&cMobLimiter&f-&4OG&7] Despawned &e%mob%&7 (%reason%) at &f%world% %x%,%y%,%z%"
@@ -44,21 +58,21 @@ limits:
   bat:
     cull: 8
   blaze:
-    age: 18000
+    age: 36000
     cull: 8
   cave_spider:
-    age: 24000
+    age: 48000
     cull: 8
   chicken: []
   cod: []
   cow: []
   creeper:
-    age: 24000
+    age: 48000
     cull: 16
   dolphin: []
   ender_dragon: []
   enderman:
-    age: 18000
+    age: 36000
     cull: 8
   endermite:
     cull: 6
@@ -68,7 +82,7 @@ limits:
   giant:
     cull: -1
   guardian:
-    age: 12000
+    age: 24000
     max: 600
     chunk_max: 100
     cull: 12
@@ -79,7 +93,7 @@ limits:
   llama:
     cull: 8
   magma_cube:
-    age: 24000
+    age: 48000
     cull: 12
   mushroom_cow: []
   ocelot:
@@ -89,7 +103,7 @@ limits:
   phantom: []
   pig: []
   zombified_piglin:
-    age: 18000
+    age: 36000
     cull: 16
   pufferfish: []
   rabbit:
@@ -129,18 +143,18 @@ limits:
   silverfish:
     cull: 6
   skeleton:
-    age: 24000
+    age: 48000
     cull: 16
   slime:
-    age: 24000
+    age: 48000
     cull: 12
   snowman:
     cull: -1
   spider:
-    age: 24000
+    age: 48000
     cull: 12
   squid:
-    age: 12000
+    age: 24000
     max: 400
     chunk_max: 50
     cull: 8
@@ -152,14 +166,14 @@ limits:
     age: -1
   vindicator: []
   witch:
-    age: 24000
+    age: 48000
     cull: 12
   wither:
     cull: -1
   wolf:
     cull: 8
   zombie:
-    age: 24000
+    age: 48000
     cull: 16
 
 spawn_eggs:
