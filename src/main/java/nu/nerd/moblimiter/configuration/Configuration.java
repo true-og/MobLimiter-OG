@@ -95,13 +95,19 @@ public class Configuration {
 
         }
 
-        for (String egg : plugin.getConfig().getStringList("spawn_eggs")) {
+        for (String eggName : plugin.getConfig().getStringList("spawn_eggs")) {
 
-            spawnEggs.add(Material.getMaterial(egg));
+            Material material = Material.matchMaterial(eggName);
+            if (material == null || !material.name().endsWith("_SPAWN_EGG")) {
+
+                plugin.getLogger().warning("Ignoring unsupported spawn egg material for this server version: " + eggName);
+                continue;
+
+            }
+
+            spawnEggs.add(material);
 
         }
-
-        System.out.println(spawnEggs);
 
     }
 
