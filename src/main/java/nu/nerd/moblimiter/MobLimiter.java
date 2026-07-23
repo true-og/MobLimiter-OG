@@ -26,7 +26,6 @@ public class MobLimiter extends JavaPlugin {
         new ClickEvents();
         new EntityEvents();
         new CommandHandler();
-        System.out.println(configuration.getSpawnEggs());
 
     }
 
