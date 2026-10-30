@@ -6,7 +6,7 @@ TrueOG Network fork of [MobLimiter](https://github.com/NerdNu/MobLimiter). Porte
 Changes over upstream
 ---------------------
 
-* **Gradle 8.14.3 build** targeting Purpur API `1.19.4-R0.1-SNAPSHOT`. Uses [Template-OG](https://github.com/true-og/Template-OG) tooling (Spotless, Checkstyle, Shadow, Eclipse integration).
+* **Gradle 8.14.3 build** targeting Purpur API `1.19.4-R0.1-SNAPSHOT`. Uses [Template-OG](https://git.trueog.net/trueog/Template-OG) tooling (Spotless, Checkstyle, Shadow, Eclipse integration).
 * **Tamed mob limiting** — new `limit_tamed` config flag (default `false`). When `true`, tamed mobs are no longer exempt from age / spawn / chunk-unload limiters.
 * **Elder guardian limiting** — new `limit_elder_guardian` config flag (default `false`). When `true`, elder guardians are no longer exempt.
 * **Vanilla persistence respect** — new `respect_persistence` flag (default `true`). Honors vanilla `PersistenceRequired` so spawn-egg, `/summon`, and trader-llama mobs are exempt from limiters, matching vanilla "never despawn" semantics. Natural-spawn mobs (spawners, mob spawning) are not persistent and remain subject to limits.
